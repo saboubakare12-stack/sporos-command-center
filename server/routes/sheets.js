@@ -151,11 +151,13 @@ router.get('/tasks', async (_req, res) => {
   try {
     const client = getSheets();
     if (!client) {
+      console.warn('[Tasks] Sheets client not available — serving demo data');
       return res.json(getDemoTasks());
     }
 
     const sheetId = process.env.GOOGLE_SHEET_ID_TASKS;
     if (!sheetId || sheetId === 'your_task_sheet_id_here') {
+      console.warn('[Tasks] GOOGLE_SHEET_ID_TASKS not configured — serving demo data');
       return res.json(getDemoTasks());
     }
 

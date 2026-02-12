@@ -5,8 +5,44 @@ import { loadMarketConfig } from './sheets.js';
 
 const router = Router();
 
-// yahoo-finance2 v3 requires instantiation
-const yf = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
+// yahoo-finance2 v3 requires instantiation with realistic user-agent for cloud hosting
+const yf = new YahooFinance({
+  suppressNotices: ['yahooSurvey'],
+  fetchOptions: {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    },
+  },
+});
+
+// Clear cookie jar periodically so Yahoo doesn't reject stale crumbs (cloud hosting fix)
+setInterval(() => {
+  try {
+    yf._opts.cookieJar.removeAllCookiesSync();
+  } catch {
+    // ignore — jar may not be initialized yet
+  }
+}, 10 * 60 * 1000); // every 10 minutes
+
+/** Retry helper — clears cookie jar on crumb/429 errors and retries */
+async function fetchWithRetry(fn, retries = 2) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries) throw err;
+      if (
+        err.message?.includes('crumb') ||
+        err.message?.includes('429') ||
+        err.message?.includes('cookie')
+      ) {
+        try { yf._opts.cookieJar.removeAllCookiesSync(); } catch { /* ignore */ }
+      }
+      await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
+    }
+  }
+}
 
 // In-memory cache with timestamps
 const cache = {
@@ -14,7 +50,7 @@ const cache = {
   history: { data: null, timestamp: 0 },
 };
 
-const CACHE_TTL = 30 * 1000; // 30 seconds
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes (longer TTL reduces requests from cloud IPs)
 
 /**
  * Get the market config — from Google Sheet if available, otherwise fallback.
@@ -51,7 +87,7 @@ router.get('/quotes', async (_req, res) => {
     const quotes = await Promise.all(
       symbols.map(async (symbol) => {
         try {
-          const q = await yf.quote(symbol);
+          const q = await fetchWithRetry(() => yf.quote(symbol));
           return {
             symbol: q.symbol,
             name: q.shortName || q.longName || symbol,
@@ -107,11 +143,9 @@ router.get('/history/:symbol', async (req, res) => {
     const start = new Date();
     start.setDate(start.getDate() - 5);
 
-    const result = await yf.chart(symbol, {
-      period1: start,
-      period2: end,
-      interval: '1h',
-    });
+    const result = await fetchWithRetry(() =>
+      yf.chart(symbol, { period1: start, period2: end, interval: '1h' })
+    );
 
     const prices = (result.quotes || []).map((q) => q.close).filter(Boolean);
 
@@ -142,11 +176,9 @@ router.get('/sparklines', async (_req, res) => {
           const start = new Date();
           start.setDate(start.getDate() - 5);
 
-          const result = await yf.chart(symbol, {
-            period1: start,
-            period2: end,
-            interval: '1h',
-          });
+          const result = await fetchWithRetry(() =>
+            yf.chart(symbol, { period1: start, period2: end, interval: '1h' })
+          );
 
           sparklines[symbol] = (result.quotes || []).map((q) => q.close).filter(Boolean);
         } catch (e) {
