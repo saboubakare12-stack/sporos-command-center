@@ -163,7 +163,7 @@ router.get('/tasks', async (_req, res) => {
 
     const response = await client.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: "'Tasks'!A:I",
+      range: 'Tasks!A:I',
     });
 
     const rows = response.data.values || [];
@@ -366,7 +366,7 @@ router.post('/tasks', async (req, res) => {
 
     await client.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: "'Tasks'!A:I",
+      range: 'Tasks!A:I',
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },
@@ -399,7 +399,7 @@ router.put('/tasks/:sheetRow', async (req, res) => {
 
     await client.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `'Tasks'!A${rowNum}:I${rowNum}`,
+      range: `Tasks!A${rowNum}:I${rowNum}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [row] },
     });
@@ -434,7 +434,7 @@ router.patch('/tasks/:sheetRow/status', async (req, res) => {
 
     await client.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `'Tasks'!D${rowNum}`,
+      range: `Tasks!D${rowNum}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [[status]] },
     });
