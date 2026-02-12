@@ -35,6 +35,38 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+// Temporary debug endpoint — test raw Google Sheets access
+app.get('/api/debug/sheets', async (_req, res) => {
+  try {
+    const { google } = await import('googleapis');
+    const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON;
+    if (!keyJson) return res.json({ error: 'GOOGLE_SERVICE_ACCOUNT_KEY_JSON not set' });
+
+    const credentials = JSON.parse(keyJson);
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    const sheetId = process.env.GOOGLE_SHEET_ID_TASKS;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: 'Tasks!A1:I3',
+    });
+
+    res.json({
+      ok: true,
+      sheetId,
+      rowCount: (response.data.values || []).length,
+      headers: response.data.values?.[0] || [],
+      sampleRow: response.data.values?.[1] || [],
+    });
+  } catch (err) {
+    res.json({ error: err.message, code: err.code, stack: err.stack?.split('\n').slice(0, 3) });
+  }
+});
+
 // --- Serve React frontend in production ---
 const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));
