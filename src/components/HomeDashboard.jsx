@@ -15,11 +15,11 @@ const statusColor = (s) => {
 
 const contentStatusColor = (s) => {
   const map = {
-    Idea: '#8A8A8A',
-    'Script Ready': '#D4A843',
-    'In Design': '#9B6FCF',
-    Filmed: '#4A90D9',
-    Published: '#6B8F71',
+    'Not started': '#8A8A8A',
+    'Needs Image': '#E85D4A',
+    Drafted: '#4A90D9',
+    Scheduled: '#D4A843',
+    Posted: '#6B8F71',
   };
   return map[s] || '#8A8A8A';
 };
@@ -210,18 +210,23 @@ function TasksSummary({ tasks, onNavigate }) {
 
 // === SECTION: Content Pipeline ===
 function ContentPipeline({ content, onNavigate }) {
-  const statuses = ['Idea', 'Script Ready', 'In Design', 'Filmed', 'Published'];
+  const statuses = ['Not started', 'Needs Image', 'Drafted', 'Scheduled', 'Posted'];
   const statusCounts = {};
   statuses.forEach((s) => {
     statusCounts[s] = content.filter((c) => c.status === s).length;
   });
 
-  const reels = content.filter((c) => c.type === 'Reel').length;
-  const posts = content.filter((c) => c.type === 'Post').length;
+  // Count unique platforms across all content
+  const platformCounts = {};
+  content.forEach((c) => {
+    (c.platforms || []).forEach((p) => {
+      platformCounts[p] = (platformCounts[p] || 0) + 1;
+    });
+  });
 
-  const upcomingFilm = content.filter((c) => {
-    if (!c.filmDate) return false;
-    const days = daysUntil(c.filmDate);
+  const upcoming = content.filter((c) => {
+    if (!c.dateScheduled) return false;
+    const days = daysUntil(c.dateScheduled);
     return days >= 0 && days <= 7;
   });
 
@@ -238,18 +243,19 @@ function ContentPipeline({ content, onNavigate }) {
         ))}
       </div>
 
-      <div className="flex gap-2 mb-3">
-        {reels > 0 && <Badge color="#E85D4A">{reels} Reels</Badge>}
-        {posts > 0 && <Badge color="#9B6FCF">{posts} Posts</Badge>}
+      <div className="flex flex-wrap gap-2 mb-3">
+        {Object.entries(platformCounts).map(([platform, count]) => (
+          <Badge key={platform} color="#8A8A8A">{count} {platform}</Badge>
+        ))}
       </div>
 
-      {upcomingFilm.length > 0 && (
+      {upcoming.length > 0 && (
         <div className="text-[12px] text-text-secondary">
-          <span className="font-medium">Upcoming film dates:</span>
-          {upcomingFilm.map((c) => (
+          <span className="font-medium">Scheduled this week:</span>
+          {upcoming.map((c) => (
             <div key={c.id} className="ml-2 mt-1">
-              🎬 {c.title} —{' '}
-              {new Date(c.filmDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              📅 {c.title} —{' '}
+              {new Date(c.dateScheduled).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>
           ))}
         </div>

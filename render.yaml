@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: sporos-command-center
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_SERVICE_ACCOUNT_KEY_JSON
+        sync: false # you'll set this manually in Render dashboard
+      - key: GOOGLE_SHEET_ID_TASKS
+        sync: false
+      - key: GOOGLE_SHEET_ID_TOUCHPOINTS
+        sync: false
+      - key: GOOGLE_SHEET_ID_MARKET
+        sync: false
+      - key: NOTION_API_KEY
+        sync: false
+      - key: NOTION_DATABASE_ID
+        sync: false

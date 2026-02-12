@@ -47,6 +47,18 @@ export function fetchContent() {
   return fetchJSON('/notion/content');
 }
 
+export function createContent(data) {
+  return mutateJSON('/notion/content', 'POST', data);
+}
+
+export function updateContent(pageId, data) {
+  return mutateJSON(`/notion/content/${pageId}`, 'PUT', data);
+}
+
+export function deleteContent(pageId) {
+  return mutateJSON(`/notion/content/${pageId}`, 'DELETE');
+}
+
 export function fetchMarketQuotes() {
   return fetchJSON('/market/quotes');
 }

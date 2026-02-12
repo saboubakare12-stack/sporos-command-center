@@ -13,21 +13,38 @@ let sheets = null;
 function getSheets() {
   if (sheets) return sheets;
 
-  const keyFilePath = path.resolve(
-    __dirname,
-    '..',
-    '..',
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || './credentials.json'
-  );
+  let auth;
 
-  if (!fs.existsSync(keyFilePath)) {
-    return null;
+  // Option 1: Credentials as JSON string in env var (for Render / cloud hosting)
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON) {
+    try {
+      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON);
+      auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+    } catch (err) {
+      console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY_JSON:', err.message);
+      return null;
+    }
+  } else {
+    // Option 2: Credentials as a file path (for local development)
+    const keyFilePath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || './credentials.json'
+    );
+
+    if (!fs.existsSync(keyFilePath)) {
+      return null;
+    }
+
+    auth = new google.auth.GoogleAuth({
+      keyFile: keyFilePath,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
   }
-
-  const auth = new google.auth.GoogleAuth({
-    keyFile: keyFilePath,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
 
   sheets = google.sheets({ version: 'v4', auth });
   return sheets;

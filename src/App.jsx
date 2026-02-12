@@ -23,7 +23,7 @@ function daysUntil(dateStr) {
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const market = useMarketData();
-  const { content } = useContent();
+  const contentData = useContent();
   const { touchpoints } = useTouchpoints();
   const taskData = useTasks();
 
@@ -47,14 +47,14 @@ export default function App() {
         {activeTab === 'home' && (
           <HomeDashboard
             tasks={taskData.tasks}
-            content={content}
+            content={contentData.content}
             touchpoints={touchpoints}
             market={market}
             onNavigate={setActiveTab}
           />
         )}
         {activeTab === 'tasks' && <TaskTracker taskData={taskData} />}
-        {activeTab === 'content' && <ContentCalendar />}
+        {activeTab === 'content' && <ContentCalendar contentData={contentData} />}
         {activeTab === 'market' && (
           <MarketPulse
             quotes={market.quotes}
