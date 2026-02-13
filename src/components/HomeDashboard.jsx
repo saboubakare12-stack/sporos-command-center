@@ -151,7 +151,6 @@ function TasksSummary({ tasks, onNavigate }) {
   const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
   const done = tasks.filter((t) => t.status === 'Done').length;
   const total = tasks.length;
-  const highPriority = tasks.filter((t) => t.priority === 'High' && t.status !== 'Done').length;
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -162,11 +161,10 @@ function TasksSummary({ tasks, onNavigate }) {
     return due < now;
   }).length;
 
-  const dueSoon = tasks.filter((t) => {
+  const dueToday = tasks.filter((t) => {
     if (!t.dueDate || t.status === 'Done') return false;
-    const days = daysUntil(t.dueDate);
-    return days >= 0 && days <= 3;
-  }).length;
+    return daysUntil(t.dueDate) === 0;
+  });
 
   return (
     <SectionCard title="Tasks" onViewAll={() => onNavigate('tasks')}>
@@ -193,17 +191,31 @@ function TasksSummary({ tasks, onNavigate }) {
         <ProgressBar value={done} max={total} color="#6B8F71" />
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {overdue > 0 && (
+      {overdue > 0 && (
+        <div className="mb-3">
           <Badge color="#E85D4A">{overdue} overdue</Badge>
-        )}
-        {dueSoon > 0 && (
-          <Badge color="#D4A843">{dueSoon} due soon</Badge>
-        )}
-        {highPriority > 0 && (
-          <Badge color="#E85D4A">{highPriority} high priority</Badge>
-        )}
-      </div>
+        </div>
+      )}
+
+      {dueToday.length > 0 && (
+        <div>
+          <div className="text-[11px] text-text-muted uppercase font-semibold mb-1.5">Due Today</div>
+          {dueToday.map((task) => (
+            <div key={task.id} className="flex items-center gap-2 mb-1.5">
+              <div
+                className="shrink-0 rounded-sm"
+                style={{ width: 3, height: 20, background: priorityColor(task.priority) }}
+              />
+              <span className="text-[12px] text-text-secondary flex-1 truncate">{task.task}</span>
+              <Badge color={statusColor(task.status)}>{task.status}</Badge>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {dueToday.length === 0 && overdue === 0 && (
+        <div className="text-[12px] text-text-muted">No tasks due today</div>
+      )}
     </SectionCard>
   );
 }
