@@ -179,11 +179,11 @@ const cache = {
   history: { data: null, timestamp: 0 },
 };
 
-// Twelve Data: 15 min cache to conserve credits (800/day ÷ ~43 symbols = ~18 refreshes/day)
+// Twelve Data: 30 min cache to conserve credits (800/day ÷ ~43 symbols = ~18 refreshes/day)
 // Yahoo: 30s cache for local dev
-const QUOTES_CACHE_TTL = useTwelveData ? 15 * 60 * 1000 : 30 * 1000;
-// Sparklines change slowly — cache for 1 hour (Twelve Data) or 2 min (Yahoo)
-const SPARKLINE_CACHE_TTL = useTwelveData ? 60 * 60 * 1000 : 2 * 60 * 1000;
+const QUOTES_CACHE_TTL = useTwelveData ? 30 * 60 * 1000 : 30 * 1000;
+// Sparklines change slowly — cache for 2 hours (Twelve Data) or 2 min (Yahoo)
+const SPARKLINE_CACHE_TTL = useTwelveData ? 2 * 60 * 60 * 1000 : 2 * 60 * 1000;
 
 async function getConfig() {
   try {
