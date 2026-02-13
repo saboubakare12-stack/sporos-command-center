@@ -2,9 +2,8 @@ import { useState } from 'react';
 
 const subViews = [
   { id: 'overview', label: 'Overview' },
-  { id: 'watchlist', label: 'Watchlist' },
+  { id: 'watchlist', label: 'Mag 7' },
   { id: 'sectors', label: 'Sectors' },
-  { id: 'zacks', label: 'Zacks #1' },
 ];
 
 function fmt(n) {
@@ -105,64 +104,26 @@ function SectorCell({ symbol, name, quote }) {
 
 // --- Sub-view: Overview ---
 function OverviewView({ quotes, onSwitchTab, config }) {
-  const topWatchlist = config.watchlist.slice(0, 5);
-  const topZacks = config.zacksRankOne.slice(0, 3);
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      {/* Left: Watchlist preview */}
+      {/* Left: Mag 7 preview */}
       <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
-        <MarketSection title="Watchlist" subtitle={`${config.watchlist.length} tickers`}>
-          {topWatchlist.map((t) => (
+        <MarketSection title="Magnificent 7" subtitle={`${config.watchlist.length} stocks`}>
+          {config.watchlist.map((t) => (
             <TickerRow key={t.symbol} symbol={t.symbol} name={t.name} quote={quotes[t.symbol]} />
           ))}
-          <div className="text-center pt-2.5">
-            <button
-              onClick={(e) => { e.stopPropagation(); onSwitchTab('watchlist'); }}
-              className="bg-transparent border-none text-gold text-xs font-semibold cursor-pointer font-body"
-            >
-              View all →
-            </button>
-          </div>
         </MarketSection>
       </div>
 
-      {/* Right column */}
-      <div className="flex flex-col gap-5">
-        {/* Sector heatmap */}
-        <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
-          <MarketSection title="Sector Heat Map" subtitle="Today's movers">
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {config.sectors.map((s) => (
-                <SectorCell key={s.symbol} symbol={s.symbol} name={s.name} quote={quotes[s.symbol]} />
-              ))}
-            </div>
-          </MarketSection>
-        </div>
-
-        {/* Zacks top 3 */}
-        <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
-          <MarketSection title="Zacks Rank #1 — Strong Buy" subtitle="Top movers">
-            {topZacks.map((t) => (
-              <TickerRow
-                key={t.symbol}
-                symbol={t.symbol}
-                name={t.name}
-                quote={quotes[t.symbol]}
-                showIndustry
-                industry={t.industry}
-              />
+      {/* Right: Sector heatmap */}
+      <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
+        <MarketSection title="Sector Heat Map" subtitle="Today's movers">
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {config.sectors.map((s) => (
+              <SectorCell key={s.symbol} symbol={s.symbol} name={s.name} quote={quotes[s.symbol]} />
             ))}
-            <div className="text-center pt-2.5">
-              <button
-                onClick={(e) => { e.stopPropagation(); onSwitchTab('zacks'); }}
-                className="bg-transparent border-none text-gold text-xs font-semibold cursor-pointer font-body"
-              >
-                View all →
-              </button>
-            </div>
-          </MarketSection>
-        </div>
+          </div>
+        </MarketSection>
       </div>
     </div>
   );
@@ -172,7 +133,7 @@ function OverviewView({ quotes, onSwitchTab, config }) {
 function WatchlistView({ quotes, config }) {
   return (
     <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
-      <MarketSection title="Full Watchlist" subtitle="Yahoo Finance API">
+      <MarketSection title="Magnificent 7" subtitle="Top mega-cap tech stocks">
         {config.watchlist.map((t) => (
           <TickerRow key={t.symbol} symbol={t.symbol} name={t.name} quote={quotes[t.symbol]} />
         ))}
@@ -206,30 +167,7 @@ function SectorsView({ quotes, config }) {
   );
 }
 
-// --- Sub-view: Zacks ---
-function ZacksView({ quotes, config }) {
-  return (
-    <div className="bg-white rounded-[14px] border border-border" style={{ padding: '20px 22px' }}>
-      <MarketSection title="Zacks Rank #1 — Strong Buy" subtitle="Updated daily from Zacks Research">
-        {config.zacksRankOne.map((t) => (
-          <TickerRow
-            key={t.symbol}
-            symbol={t.symbol}
-            name={t.name}
-            quote={quotes[t.symbol]}
-            showIndustry
-            industry={t.industry}
-          />
-        ))}
-      </MarketSection>
-      <div className="mt-3 py-2.5 px-3.5 bg-warm-white rounded-lg text-xs text-text-muted text-center">
-        Zacks Rank #1 list refreshes daily · Not investment advice · For research purposes only
-      </div>
-    </div>
-  );
-}
-
-const defaultConfig = { indices: [], watchlist: [], sectors: [], zacksRankOne: [] };
+const defaultConfig = { indices: [], watchlist: [], sectors: [] };
 
 export default function MarketPulse({ quotes, marketOpen, lastUpdated, onRefresh, config = defaultConfig }) {
   const [view, setView] = useState('overview');
@@ -297,11 +235,10 @@ export default function MarketPulse({ quotes, marketOpen, lastUpdated, onRefresh
       {view === 'overview' && <OverviewView quotes={quotes} onSwitchTab={setView} config={config} />}
       {view === 'watchlist' && <WatchlistView quotes={quotes} config={config} />}
       {view === 'sectors' && <SectorsView quotes={quotes} config={config} />}
-      {view === 'zacks' && <ZacksView quotes={quotes} config={config} />}
 
       {/* Connected-to footer */}
       <div className="mt-4 py-3.5 px-5 bg-surface rounded-[10px] text-[13px] text-text-secondary text-center">
-        📈 Connected to: <strong>Yahoo Finance API</strong> — Prices refresh every 60 seconds during market hours
+        Indices via Twelve Data · Stocks via Alpha Vantage · Cached hourly
       </div>
     </div>
   );

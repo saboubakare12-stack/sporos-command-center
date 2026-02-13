@@ -265,7 +265,6 @@ router.get('/quotes', async (_req, res) => {
       ...config.indices.map((s) => s.symbol),
       ...config.watchlist.map((s) => s.symbol),
       ...config.sectors.map((s) => s.symbol),
-      ...config.zacksRankOne.map((s) => s.symbol),
     ];
     const symbols = [...new Set(allSymbols)];
     const quotes = await getQuotes(symbols);

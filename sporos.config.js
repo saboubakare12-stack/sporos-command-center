@@ -5,16 +5,15 @@
 // After saving changes, refresh your browser.
 
 const config = {
-  // --- Watchlist Tickers ---
-  // Add or remove tickers you want to track
+  // --- Magnificent 7 Stocks ---
   watchlist: [
     { symbol: 'AAPL', name: 'Apple Inc.' },
     { symbol: 'MSFT', name: 'Microsoft Corp.' },
     { symbol: 'NVDA', name: 'NVIDIA Corp.' },
     { symbol: 'GOOGL', name: 'Alphabet Inc.' },
     { symbol: 'AMZN', name: 'Amazon.com Inc.' },
-    { symbol: 'PMAR', name: 'Innovator U.S. Equity Power Buffer ETF - March' },
-    { symbol: 'BUFF', name: 'Innovator Laddered Allocation Power Buffer ETF' },
+    { symbol: 'META', name: 'Meta Platforms Inc.' },
+    { symbol: 'TSLA', name: 'Tesla Inc.' },
   ],
 
   // --- Sector ETFs ---
@@ -27,16 +26,6 @@ const config = {
     { symbol: 'XLY', name: 'Consumer Discretionary' },
     { symbol: 'XLP', name: 'Consumer Staples' },
     { symbol: 'XLRE', name: 'Real Estate' },
-  ],
-
-  // --- Zacks Rank #1 (Strong Buy) Stocks ---
-  // Update this list as rankings change
-  zacksRankOne: [
-    { symbol: 'CRWD', name: 'CrowdStrike Holdings', industry: 'Cybersecurity' },
-    { symbol: 'AXON', name: 'Axon Enterprise', industry: 'Aerospace & Defense' },
-    { symbol: 'VST', name: 'Vistra Corp.', industry: 'Utilities - Independent Power' },
-    { symbol: 'TOST', name: 'Toast Inc.', industry: 'Software - Application' },
-    { symbol: 'APP', name: 'AppLovin Corp.', industry: 'Software - Application' },
   ],
 
   // --- Major Indices (shown in header ticker strip) ---

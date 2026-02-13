@@ -6,8 +6,8 @@ const config = {
     { symbol: 'NVDA', name: 'NVIDIA Corp.' },
     { symbol: 'GOOGL', name: 'Alphabet Inc.' },
     { symbol: 'AMZN', name: 'Amazon.com Inc.' },
-    { symbol: 'PMAR', name: 'Innovator U.S. Equity Power Buffer ETF - March' },
-    { symbol: 'BUFF', name: 'Innovator Laddered Allocation Power Buffer ETF' },
+    { symbol: 'META', name: 'Meta Platforms Inc.' },
+    { symbol: 'TSLA', name: 'Tesla Inc.' },
   ],
   sectors: [
     { symbol: 'XLK', name: 'Technology' },
@@ -18,13 +18,6 @@ const config = {
     { symbol: 'XLY', name: 'Consumer Discretionary' },
     { symbol: 'XLP', name: 'Consumer Staples' },
     { symbol: 'XLRE', name: 'Real Estate' },
-  ],
-  zacksRankOne: [
-    { symbol: 'CRWD', name: 'CrowdStrike Holdings', industry: 'Cybersecurity' },
-    { symbol: 'AXON', name: 'Axon Enterprise', industry: 'Aerospace & Defense' },
-    { symbol: 'VST', name: 'Vistra Corp.', industry: 'Utilities - Independent Power' },
-    { symbol: 'TOST', name: 'Toast Inc.', industry: 'Software - Application' },
-    { symbol: 'APP', name: 'AppLovin Corp.', industry: 'Software - Application' },
   ],
   indices: [
     { symbol: '^GSPC', name: 'S&P 500' },
