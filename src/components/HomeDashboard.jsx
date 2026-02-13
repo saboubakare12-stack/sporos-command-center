@@ -147,13 +147,18 @@ function TodaysFocus({ tasks }) {
 
 // === SECTION: Tasks Summary ===
 function TasksSummary({ tasks, onNavigate }) {
-  const todo = tasks.filter((t) => t.status === 'To Do').length;
-  const inProgress = tasks.filter((t) => t.status === 'In Progress').length;
-  const done = tasks.filter((t) => t.status === 'Done').length;
-  const total = tasks.length;
-
   const now = new Date();
   now.setHours(0, 0, 0, 0);
+
+  // All tasks due today (including done ones for progress)
+  const allDueToday = tasks.filter((t) => {
+    if (!t.dueDate) return false;
+    return daysUntil(t.dueDate) === 0;
+  });
+  const dueTodayDone = allDueToday.filter((t) => t.status === 'Done').length;
+  const dueTodayTotal = allDueToday.length;
+  const dueTodayPending = allDueToday.filter((t) => t.status !== 'Done');
+
   const overdue = tasks.filter((t) => {
     if (!t.dueDate || t.status === 'Done') return false;
     const due = new Date(t.dueDate);
@@ -161,35 +166,19 @@ function TasksSummary({ tasks, onNavigate }) {
     return due < now;
   }).length;
 
-  const dueToday = tasks.filter((t) => {
-    if (!t.dueDate || t.status === 'Done') return false;
-    return daysUntil(t.dueDate) === 0;
-  });
-
   return (
     <SectionCard title="Tasks" onViewAll={() => onNavigate('tasks')}>
-      <div className="flex gap-4 mb-3">
-        <div className="text-center flex-1">
-          <div className="text-[20px] font-semibold" style={{ color: '#8A8A8A' }}>{todo}</div>
-          <div className="text-[11px] text-text-muted uppercase">To Do</div>
+      {dueTodayTotal > 0 ? (
+        <div className="mb-3">
+          <div className="flex justify-between text-[11px] text-text-muted mb-1">
+            <span>Today's progress</span>
+            <span>{dueTodayDone}/{dueTodayTotal} done</span>
+          </div>
+          <ProgressBar value={dueTodayDone} max={dueTodayTotal} color="#6B8F71" />
         </div>
-        <div className="text-center flex-1">
-          <div className="text-[20px] font-semibold" style={{ color: '#4A90D9' }}>{inProgress}</div>
-          <div className="text-[11px] text-text-muted uppercase">In Progress</div>
-        </div>
-        <div className="text-center flex-1">
-          <div className="text-[20px] font-semibold" style={{ color: '#6B8F71' }}>{done}</div>
-          <div className="text-[11px] text-text-muted uppercase">Done</div>
-        </div>
-      </div>
-
-      <div className="mb-3">
-        <div className="flex justify-between text-[11px] text-text-muted mb-1">
-          <span>Progress</span>
-          <span>{total > 0 ? Math.round((done / total) * 100) : 0}%</span>
-        </div>
-        <ProgressBar value={done} max={total} color="#6B8F71" />
-      </div>
+      ) : (
+        <div className="mb-3 text-[12px] text-text-muted">No tasks due today</div>
+      )}
 
       {overdue > 0 && (
         <div className="mb-3">
@@ -197,10 +186,10 @@ function TasksSummary({ tasks, onNavigate }) {
         </div>
       )}
 
-      {dueToday.length > 0 && (
+      {dueTodayPending.length > 0 && (
         <div>
           <div className="text-[11px] text-text-muted uppercase font-semibold mb-1.5">Due Today</div>
-          {dueToday.map((task) => (
+          {dueTodayPending.map((task) => (
             <div key={task.id} className="flex items-center gap-2 mb-1.5">
               <div
                 className="shrink-0 rounded-sm"
@@ -211,10 +200,6 @@ function TasksSummary({ tasks, onNavigate }) {
             </div>
           ))}
         </div>
-      )}
-
-      {dueToday.length === 0 && overdue === 0 && (
-        <div className="text-[12px] text-text-muted">No tasks due today</div>
       )}
     </SectionCard>
   );
