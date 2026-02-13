@@ -257,7 +257,7 @@ function taskToRow(data) {
   return [
     data.task || '',
     data.project || '',
-    data.category || 'General',
+    '', // Category — auto-populated by sheet formula, leave blank
     data.status || 'To Do',
     toSheetDate(data.dueDate),
     '', // Days to Complete — calculated by sheet formula
@@ -295,7 +295,7 @@ router.post('/tasks', async (req, res) => {
   }
 });
 
-// PUT /api/sheets/tasks/:sheetRow — Overwrite a full task row
+// PUT /api/sheets/tasks/:sheetRow — Update task (skip Category column C — it has a formula)
 router.put('/tasks/:sheetRow', async (req, res) => {
   try {
     const client = getSheets();
@@ -311,13 +311,31 @@ router.put('/tasks/:sheetRow', async (req, res) => {
       return res.status(400).json({ error: 'Invalid row number' });
     }
 
-    const row = taskToRow(req.body);
+    const data = req.body;
 
+    // Update columns A-B (Task, Project) — skip C (Category, formula)
     await client.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `Tasks!A${rowNum}:I${rowNum}`,
+      range: `Tasks!A${rowNum}:B${rowNum}`,
       valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [row] },
+      requestBody: { values: [[data.task || '', data.project || '']] },
+    });
+
+    // Update columns D-I (Status, Due Date, Days to Complete, Priority, Notes, Top Task) — skip C
+    await client.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `Tasks!D${rowNum}:I${rowNum}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          data.status || 'To Do',
+          toSheetDate(data.dueDate),
+          '', // Days to Complete — calculated by sheet
+          data.priority || 'Medium',
+          data.notes || '',
+          data.topTask ? 'TRUE' : 'FALSE',
+        ]],
+      },
     });
 
     res.json({ ok: true });
