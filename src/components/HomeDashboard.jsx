@@ -268,87 +268,6 @@ function ContentPipeline({ content, onNavigate }) {
   );
 }
 
-// === SECTION: Market Snapshot ===
-function MarketSnapshot({ market, onNavigate }) {
-  const { quotes, marketOpen, config } = market;
-  const indices = config?.indices || [];
-
-  // Top movers from watchlist (by absolute change %)
-  const watchlist = config?.watchlist || [];
-  const movers = watchlist
-    .filter((w) => quotes[w.symbol]?.regularMarketChangePercent != null)
-    .sort((a, b) =>
-      Math.abs(quotes[b.symbol].regularMarketChangePercent) -
-      Math.abs(quotes[a.symbol].regularMarketChangePercent)
-    )
-    .slice(0, 3);
-
-  return (
-    <SectionCard title="Market Snapshot" onViewAll={() => onNavigate('market')}>
-      <div className="flex items-center gap-2 mb-3">
-        <div
-          className="rounded-full"
-          style={{
-            width: 8,
-            height: 8,
-            background: marketOpen ? '#6B8F71' : '#8A8A8A',
-          }}
-        />
-        <span className="text-[12px] font-medium" style={{ color: marketOpen ? '#6B8F71' : '#8A8A8A' }}>
-          Market {marketOpen ? 'Open' : 'Closed'}
-        </span>
-      </div>
-
-      {/* Indices */}
-      <div className="flex flex-col gap-2 mb-3">
-        {indices.map((idx) => {
-          const q = quotes[idx.symbol];
-          if (!q) return null;
-          const change = q.regularMarketChangePercent || 0;
-          const color = change >= 0 ? '#6B8F71' : '#E85D4A';
-          return (
-            <div key={idx.symbol} className="flex justify-between items-center">
-              <span className="text-[13px] font-medium">{idx.name}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-[13px] font-semibold">
-                  {q.regularMarketPrice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '—'}
-                </span>
-                <span className="text-[12px] font-semibold" style={{ color }}>
-                  {change >= 0 ? '+' : ''}{change.toFixed(2)}%
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Top movers */}
-      {movers.length > 0 && (
-        <div>
-          <div className="text-[11px] text-text-muted uppercase font-semibold mb-1.5">Top Movers</div>
-          {movers.map((w) => {
-            const q = quotes[w.symbol];
-            const change = q.regularMarketChangePercent;
-            const color = change >= 0 ? '#6B8F71' : '#E85D4A';
-            return (
-              <div key={w.symbol} className="flex justify-between items-center mb-1">
-                <span className="text-[12px] text-text-secondary">{w.symbol}</span>
-                <span className="text-[12px] font-semibold" style={{ color }}>
-                  {change >= 0 ? '+' : ''}{change.toFixed(2)}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {indices.length === 0 && Object.keys(quotes).length === 0 && (
-        <p className="text-[13px] text-text-muted m-0">Market data loading...</p>
-      )}
-    </SectionCard>
-  );
-}
-
 // === SECTION: Upcoming Touchpoints ===
 function TouchpointsSummary({ touchpoints, onNavigate }) {
   const sorted = [...touchpoints]
@@ -405,7 +324,7 @@ function TouchpointsSummary({ touchpoints, onNavigate }) {
 }
 
 // === MAIN DASHBOARD ===
-export default function HomeDashboard({ tasks, content, touchpoints, market, onNavigate }) {
+export default function HomeDashboard({ tasks, content, touchpoints, onNavigate }) {
   return (
     <div>
       {/* Today's Focus — full width */}
@@ -413,11 +332,10 @@ export default function HomeDashboard({ tasks, content, touchpoints, market, onN
         <TodaysFocus tasks={tasks} />
       </div>
 
-      {/* 2x2 grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <TasksSummary tasks={tasks} onNavigate={onNavigate} />
         <ContentPipeline content={content} onNavigate={onNavigate} />
-        <MarketSnapshot market={market} onNavigate={onNavigate} />
         <TouchpointsSummary touchpoints={touchpoints} onNavigate={onNavigate} />
       </div>
     </div>

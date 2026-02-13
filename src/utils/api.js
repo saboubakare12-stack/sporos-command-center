@@ -59,14 +59,3 @@ export function deleteContent(pageId) {
   return mutateJSON(`/notion/content/${pageId}`, 'DELETE');
 }
 
-export function fetchMarketQuotes() {
-  return fetchJSON('/market/quotes');
-}
-
-export function fetchSparklines() {
-  return fetchJSON('/market/sparklines');
-}
-
-export function fetchMarketConfig() {
-  return fetchJSON('/market/config');
-}

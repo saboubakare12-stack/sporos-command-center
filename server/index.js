@@ -5,7 +5,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { sheetsRouter } from './routes/sheets.js';
 import { notionRouter } from './routes/notion.js';
-import { marketRouter } from './routes/market.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -17,7 +16,6 @@ app.use(express.json());
 // API Routes
 app.use('/api/sheets', sheetsRouter);
 app.use('/api/notion', notionRouter);
-app.use('/api/market', marketRouter);
 
 // Health check + env diagnostics (no secrets exposed)
 app.get('/api/health', (_req, res) => {
@@ -28,7 +26,6 @@ app.get('/api/health', (_req, res) => {
       GOOGLE_SERVICE_ACCOUNT_KEY_JSON: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON ? 'SET' : 'NOT SET',
       GOOGLE_SHEET_ID_TASKS: process.env.GOOGLE_SHEET_ID_TASKS ? 'SET' : 'NOT SET',
       GOOGLE_SHEET_ID_TOUCHPOINTS: process.env.GOOGLE_SHEET_ID_TOUCHPOINTS ? 'SET' : 'NOT SET',
-      GOOGLE_SHEET_ID_MARKET: process.env.GOOGLE_SHEET_ID_MARKET ? 'SET' : 'NOT SET',
       NOTION_API_KEY: process.env.NOTION_API_KEY ? 'SET' : 'NOT SET',
       NOTION_DATABASE_ID: process.env.NOTION_DATABASE_ID ? 'SET' : 'NOT SET',
     },

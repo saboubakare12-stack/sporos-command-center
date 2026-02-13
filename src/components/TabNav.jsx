@@ -2,7 +2,6 @@ const tabs = [
   { id: 'home', label: 'Home', icon: '⬡' },
   { id: 'tasks', label: 'Tasks', icon: '◆' },
   { id: 'content', label: 'Content', icon: '▶' },
-  { id: 'market', label: 'Market Pulse', icon: '◉' },
   { id: 'touchpoints', label: 'Touchpoints', icon: '♡' },
 ];
 

@@ -14,13 +14,7 @@ services:
         sync: false
       - key: GOOGLE_SHEET_ID_TOUCHPOINTS
         sync: false
-      - key: GOOGLE_SHEET_ID_MARKET
-        sync: false
       - key: NOTION_API_KEY
         sync: false
       - key: NOTION_DATABASE_ID
-        sync: false
-      - key: TWELVE_DATA_API_KEY
-        sync: false
-      - key: ALPHA_VANTAGE_API_KEY
         sync: false
