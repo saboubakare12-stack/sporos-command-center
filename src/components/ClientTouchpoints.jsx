@@ -1,11 +1,16 @@
 import { useTouchpoints } from '../hooks/useTouchpoints';
 
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function daysUntil(dateStr) {
-  if (!dateStr) return Infinity;
-  const target = new Date(dateStr);
+  const target = parseLocalDate(dateStr);
+  if (!target) return Infinity;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
   return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
 }
 
@@ -112,7 +117,7 @@ export default function ClientTouchpoints() {
                     style={{ color: days <= 3 ? '#E85D4A' : '#2C2825' }}
                   >
                     {tp.date
-                      ? new Date(tp.date).toLocaleDateString('en-US', {
+                      ? parseLocalDate(tp.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                         })

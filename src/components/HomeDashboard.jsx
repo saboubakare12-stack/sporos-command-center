@@ -39,12 +39,18 @@ const touchpointTypeColor = (t) => {
   return map[t] || '#8A8A8A';
 };
 
+/** Parse YYYY-MM-DD as local date (not UTC) */
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function daysUntil(dateStr) {
-  if (!dateStr) return Infinity;
-  const target = new Date(dateStr);
+  const target = parseLocalDate(dateStr);
+  if (!target) return Infinity;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
   return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
 }
 
@@ -135,7 +141,7 @@ function TodaysFocus({ tasks }) {
             <Badge color={statusColor(task.status)}>{task.status}</Badge>
             <span className="text-[12px] text-text-secondary shrink-0">
               {task.dueDate
-                ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                ? parseLocalDate(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                 : ''}
             </span>
           </div>
@@ -161,9 +167,7 @@ function TasksSummary({ tasks, onNavigate }) {
 
   const overdue = tasks.filter((t) => {
     if (!t.dueDate || t.status === 'Done') return false;
-    const due = new Date(t.dueDate);
-    due.setHours(0, 0, 0, 0);
-    return due < now;
+    return daysUntil(t.dueDate) < 0;
   }).length;
 
   return (
@@ -305,7 +309,7 @@ function TouchpointsSummary({ touchpoints, onNavigate }) {
                   </div>
                   <div className="text-[11px] text-text-muted">
                     {tp.date
-                      ? new Date(tp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                      ? parseLocalDate(tp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                       : ''}
                   </div>
                 </div>

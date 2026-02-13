@@ -11,10 +11,10 @@ import { useTasks } from './hooks/useTasks';
 
 function daysUntil(dateStr) {
   if (!dateStr) return Infinity;
-  const target = new Date(dateStr);
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const target = new Date(y, m - 1, d);
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
   return Math.ceil((target - now) / (1000 * 60 * 60 * 24));
 }
 

@@ -101,11 +101,22 @@ router.get('/tasks', async (_req, res) => {
       const dueDateStr = (row[dueDateIdx !== -1 ? dueDateIdx : 4] || '').trim();
       let dueDate = null;
       if (dueDateStr) {
-        // Parse M/D/YYYY or MM/DD/YYYY format
         const parts = dueDateStr.split('/');
         if (parts.length === 3) {
+          // M/D/YYYY or MM/DD/YYYY
           const [m, d, y] = parts;
           dueDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        } else if (parts.length === 2) {
+          // M/D without year — assume current year
+          const [m, d] = parts;
+          const y = new Date().getFullYear();
+          dueDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        } else {
+          // Try parsing other date formats (e.g. "Feb 12, 2026")
+          const parsed = new Date(dueDateStr);
+          if (!isNaN(parsed.getTime())) {
+            dueDate = parsed.toISOString().split('T')[0];
+          }
         }
       }
 
