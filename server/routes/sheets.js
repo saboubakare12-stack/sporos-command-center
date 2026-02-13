@@ -103,8 +103,9 @@ router.get('/tasks', async (_req, res) => {
       if (dueDateStr) {
         const parts = dueDateStr.split('/');
         if (parts.length === 3) {
-          // M/D/YYYY or MM/DD/YYYY
-          const [m, d, y] = parts;
+          // M/D/YYYY, MM/DD/YYYY, or M/D/YY
+          const [m, d, rawY] = parts;
+          const y = rawY.length <= 2 ? `20${rawY.padStart(2, '0')}` : rawY;
           dueDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
         } else if (parts.length === 2) {
           // M/D without year — assume current year
